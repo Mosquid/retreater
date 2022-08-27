@@ -54,28 +54,44 @@ const handleWasdPress = () => {
   const keys = Array.from(keysPressed.keys());
 
   keys.forEach((key) => {
-    trail.push([x, y]);
     if (!DIRECTION_MAP[key]) return;
+
+    if (!trail.length) {
+      trail.push([x, y]);
+    }
 
     const action = DIRECTION_MAP[key];
 
-    if (typeof action === "function") action();
+    if (typeof action === "function") {
+      const changed = action();
+      if (changed) {
+        trail.push([x, y]);
+      }
+    }
   });
 };
 
 const handleMoveX = (dir = DIRECTIONS_X.right) => {
+  let newX;
+  const oldX = x;
   if (dir === DIRECTIONS_X.right) {
-    x = Math.min(X_MAX, x + STEP_X);
+    newX = Math.min(X_MAX, x + STEP_X);
   } else {
-    x = Math.max(0, x - STEP_X);
+    newX = Math.max(0, x - STEP_X);
   }
+  x = newX;
+  return x !== oldX;
 };
 const handleMoveY = (dir = DIRECTIONS_Y.up) => {
+  let newY;
+  const oldY = y;
   if (dir === DIRECTIONS_Y.up) {
-    y = Math.max(0, y - STEP_Y);
+    newY = Math.max(0, y - STEP_Y);
   } else {
-    y = Math.min(Y_MAX, y + STEP_Y);
+    newY = Math.min(Y_MAX, y + STEP_Y);
   }
+  y = newY;
+  return oldY !== y;
 };
 
 const replay = () => {
