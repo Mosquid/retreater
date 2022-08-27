@@ -14,6 +14,7 @@ const DIRECTION_MAP = {
   a: () => handleMoveX(DIRECTIONS_X.left),
   d: () => handleMoveX(DIRECTIONS_X.right),
 };
+const keysPressed = new Map();
 const trail = [];
 
 can.height = HEIGHT;
@@ -49,14 +50,17 @@ function draw() {
 
 draw();
 
-const handleWasdPress = (e) => {
-  const { key } = e;
-  trail.push([x, y]);
-  if (!DIRECTION_MAP[key]) return;
+const handleWasdPress = () => {
+  const keys = Array.from(keysPressed.keys());
 
-  const action = DIRECTION_MAP[key];
+  keys.forEach((key) => {
+    trail.push([x, y]);
+    if (!DIRECTION_MAP[key]) return;
 
-  if (typeof action === "function") action();
+    const action = DIRECTION_MAP[key];
+
+    if (typeof action === "function") action();
+  });
 };
 
 const handleMoveX = (dir = DIRECTIONS_X.right) => {
@@ -92,5 +96,24 @@ const handleReplayClick = (e) => {
   }
 };
 
+const handleButtonUp = (e) => {
+  const { key } = e;
+
+  if (keysPressed.has(key)) {
+    keysPressed.delete(key);
+  }
+  handleWasdPress();
+};
+const handleButtonDown = (e) => {
+  const { key } = e;
+
+  if (!keysPressed.has(key)) {
+    keysPressed.set(key, true);
+  }
+
+  handleWasdPress();
+};
+
 can.addEventListener("click", handleReplayClick);
-document.body.addEventListener("keypress", handleWasdPress);
+document.body.addEventListener("keyup", handleButtonUp);
+document.body.addEventListener("keydown", handleButtonDown);
