@@ -22,13 +22,25 @@ can.width = WIDTH;
 const ctx = can.getContext("2d");
 let x = WIDTH / 2 - RADIUS / 2;
 let y = HEIGHT / 2 - RADIUS / 2;
+const baseX = x;
+const baseY = y;
 let replaying = false;
+let base;
+
+const drawEllipse = (color, _x, _y) => {
+  const ellipse = new Path2D();
+
+  ellipse.ellipse(_x, _y, RADIUS, RADIUS, Math.PI * 0.25, 0, 2 * Math.PI);
+  ctx.lineWidth = 25;
+  ctx.fillStyle = color;
+  ctx.fill(ellipse);
+
+  return ellipse;
+};
 
 function draw() {
-  ctx.beginPath();
-  ctx.arc(x, y, RADIUS, 0, 2 * Math.PI);
-  ctx.fillStyle = "rgba(250,0,0,0.4)";
-  ctx.fill();
+  base = drawEllipse("yellow", baseX, baseY);
+  const bot = drawEllipse("red", x, y);
 
   ctx.fillStyle = "rgba(34,45,23,0.4)";
   ctx.fillRect(0, 0, can.width, can.height);
@@ -72,11 +84,13 @@ const replay = () => {
   setTimeout(replay, 25);
 };
 
-const handleReplayClick = () => {
-  if (replaying) return;
+const handleReplayClick = (e) => {
+  if (replaying || !base) return;
 
-  replay();
+  if (ctx.isPointInPath(base, e.offsetX, e.offsetY)) {
+    replay();
+  }
 };
 
-document.querySelector("button")?.addEventListener("click", handleReplayClick);
+can.addEventListener("click", handleReplayClick);
 document.body.addEventListener("keypress", handleWasdPress);
