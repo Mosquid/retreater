@@ -44,6 +44,9 @@ const drawEllipse = (color, _x, _y) => {
 
 function draw() {
   ctx.clearRect(0, 0, can.width, can.height);
+  ctx.font = "15px sans-serif";
+  ctx.fillStyle = "rgba(0,0,0,0.9)";
+  ctx.fillText(`Steps in memory: ${trail.length}`, 15, 25);
   ctx.fillStyle = "rgba(135,206,235,0.4)";
   ctx.fillRect(0, 0, can.width, can.height);
   requestAnimationFrame(draw);
