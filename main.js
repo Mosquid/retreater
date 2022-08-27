@@ -32,7 +32,6 @@ const drawEllipse = (color, _x, _y) => {
   const ellipse = new Path2D();
 
   ellipse.ellipse(_x, _y, RADIUS, RADIUS, Math.PI * 0.25, 0, 2 * Math.PI);
-  ctx.lineWidth = 25;
   ctx.fillStyle = color;
   ctx.fill(ellipse);
 
@@ -85,7 +84,7 @@ const replay = () => {
   x = moveX;
   y = moveY;
 
-  setTimeout(replay, 25);
+  setTimeout(replay, 15);
 };
 
 const handleReplayClick = (e) => {
