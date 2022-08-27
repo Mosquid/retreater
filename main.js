@@ -39,12 +39,13 @@ const drawEllipse = (color, _x, _y) => {
 };
 
 function draw() {
-  base = drawEllipse("yellow", baseX, baseY);
-  const bot = drawEllipse("red", x, y);
-
+  ctx.clearRect(0, 0, can.width, can.height);
   ctx.fillStyle = "rgba(135,206,235,0.4)";
   ctx.fillRect(0, 0, can.width, can.height);
   requestAnimationFrame(draw);
+
+  base = drawEllipse("yellow", baseX, baseY);
+  const bot = drawEllipse("red", x, y);
 }
 
 draw();
