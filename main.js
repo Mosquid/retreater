@@ -8,11 +8,17 @@ const STEP_X = Math.ceil(WIDTH / 100);
 const STEP_Y = Math.ceil(HEIGHT / 100);
 const X_MAX = WIDTH - RADIUS / 2;
 const Y_MAX = HEIGHT - RADIUS / 2;
+const KEY_MAP = {
+  w: "up",
+  s: "down",
+  a: "left",
+  d: "right",
+};
 const DIRECTION_MAP = {
-  s: () => handleMoveY(DIRECTIONS_Y.down),
-  w: () => handleMoveY(DIRECTIONS_Y.up),
-  a: () => handleMoveX(DIRECTIONS_X.left),
-  d: () => handleMoveX(DIRECTIONS_X.right),
+  [DIRECTIONS_Y.down]: () => handleMoveY(DIRECTIONS_Y.down),
+  [DIRECTIONS_Y.up]: () => handleMoveY(DIRECTIONS_Y.up),
+  [DIRECTIONS_X.left]: () => handleMoveX(DIRECTIONS_X.left),
+  [DIRECTIONS_X.right]: () => handleMoveX(DIRECTIONS_X.right),
 };
 const keysPressed = new Map();
 const trail = [];
@@ -48,58 +54,59 @@ function draw() {
   const bot = drawEllipse("red", x, y);
 }
 
-draw();
-
 const handleWasdPress = () => {
   const keys = Array.from(keysPressed.keys());
 
   keys.forEach((key) => {
-    if (!DIRECTION_MAP[key]) return;
-
-    if (!trail.length) {
-      trail.push([x, y]);
-    }
-
-    const action = DIRECTION_MAP[key];
-
-    if (typeof action === "function") {
-      const changed = action();
-      if (changed) {
-        trail.push([x, y]);
-      }
-    }
+    const reverse = handleMove(key);
+    reverse && trail.push(reverse);
   });
 };
 
 const handleMoveX = (dir = DIRECTIONS_X.right) => {
   let newX;
+  let reverse;
   const oldX = x;
   if (dir === DIRECTIONS_X.right) {
+    reverse = DIRECTIONS_X.left;
     newX = Math.min(X_MAX, x + STEP_X);
   } else {
+    reverse = DIRECTIONS_X.right;
     newX = Math.max(0, x - STEP_X);
   }
   x = newX;
-  return x !== oldX;
+  return x !== oldX && reverse;
 };
+
 const handleMoveY = (dir = DIRECTIONS_Y.up) => {
   let newY;
   const oldY = y;
+  let reverse;
   if (dir === DIRECTIONS_Y.up) {
+    reverse = DIRECTIONS_Y.down;
     newY = Math.max(0, y - STEP_Y);
   } else {
+    reverse = DIRECTIONS_Y.up;
     newY = Math.min(Y_MAX, y + STEP_Y);
   }
   y = newY;
-  return oldY !== y;
+  return oldY !== y && reverse;
+};
+
+const handleMove = (key) => {
+  if (!DIRECTION_MAP[key]) return;
+  const action = DIRECTION_MAP[key];
+
+  if (typeof action === "function") {
+    return action();
+  }
 };
 
 const replay = () => {
   if (!trail.length) return;
-  const [moveX, moveY] = trail.pop();
+  const dir = trail.pop();
 
-  x = moveX;
-  y = moveY;
+  handleMove(dir);
 
   setTimeout(replay, 15);
 };
@@ -112,24 +119,32 @@ const handleReplayClick = (e) => {
   }
 };
 
-const handleButtonUp = (e) => {
-  const { key } = e;
+const getDirectionByKey = (key) => {
+  return KEY_MAP[key] ? KEY_MAP[key] : null;
+};
 
-  if (keysPressed.has(key)) {
-    keysPressed.delete(key);
+const handleKeyUp = (e) => {
+  const { key } = e;
+  const dir = getDirectionByKey(key);
+
+  if (keysPressed.has(dir)) {
+    keysPressed.delete(dir);
   }
   handleWasdPress();
 };
-const handleButtonDown = (e) => {
-  const { key } = e;
 
-  if (!keysPressed.has(key)) {
-    keysPressed.set(key, true);
+const handleKeyDown = (e) => {
+  const { key } = e;
+  const dir = getDirectionByKey(key);
+
+  if (!keysPressed.has(dir)) {
+    keysPressed.set(dir, true);
   }
 
   handleWasdPress();
 };
 
+draw();
 can.addEventListener("click", handleReplayClick);
-document.body.addEventListener("keyup", handleButtonUp);
-document.body.addEventListener("keydown", handleButtonDown);
+document.body.addEventListener("keyup", handleKeyUp);
+document.body.addEventListener("keydown", handleKeyDown);
