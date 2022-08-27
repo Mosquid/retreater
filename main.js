@@ -22,6 +22,7 @@ can.width = WIDTH;
 const ctx = can.getContext("2d");
 let x = WIDTH / 2 - RADIUS / 2;
 let y = HEIGHT / 2 - RADIUS / 2;
+let replaying = false;
 
 function draw() {
   ctx.beginPath();
@@ -71,5 +72,11 @@ const replay = () => {
   setTimeout(replay, 25);
 };
 
-document.querySelector("button")?.addEventListener("click", replay);
+const handleReplayClick = () => {
+  if (replaying) return;
+
+  replay();
+};
+
+document.querySelector("button")?.addEventListener("click", handleReplayClick);
 document.body.addEventListener("keypress", handleWasdPress);
