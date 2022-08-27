@@ -6,8 +6,6 @@ const DIRECTIONS_Y = { up: "up", down: "down" };
 const DIRECTIONS_X = { left: "left", right: "right" };
 const STEP_X = Math.ceil(WIDTH / 100);
 const STEP_Y = Math.ceil(HEIGHT / 100);
-const X_MAX = WIDTH - RADIUS / 2;
-const Y_MAX = HEIGHT - RADIUS / 2;
 const KEY_MAP = {
   w: "up",
   s: "down",
@@ -51,7 +49,7 @@ function draw() {
   requestAnimationFrame(draw);
 
   base = drawEllipse("yellow", baseX, baseY);
-  const bot = drawEllipse("red", x, y);
+  drawEllipse("red", x, y);
 }
 
 const handleWasdPress = () => {
@@ -63,34 +61,49 @@ const handleWasdPress = () => {
   });
 };
 
+const canMoveX = (dir) => {
+  if (dir === DIRECTIONS_X.left) {
+    return x - RADIUS > 0;
+  } else {
+    return x + RADIUS < WIDTH;
+  }
+};
+const canMoveY = (dir) => {
+  if (dir === DIRECTIONS_Y.down) {
+    return y + RADIUS < HEIGHT;
+  } else {
+    return y - RADIUS > 0;
+  }
+};
+
 const handleMoveX = (dir = DIRECTIONS_X.right) => {
-  let newX;
+  if (!canMoveX(dir)) return;
+
   let reverse;
-  const oldX = x;
+
   if (dir === DIRECTIONS_X.right) {
     reverse = DIRECTIONS_X.left;
-    newX = Math.min(X_MAX, x + STEP_X);
+    x = x + STEP_X;
   } else {
     reverse = DIRECTIONS_X.right;
-    newX = Math.max(0, x - STEP_X);
+    x = x - STEP_X;
   }
-  x = newX;
-  return x !== oldX && reverse;
+  return reverse;
 };
 
 const handleMoveY = (dir = DIRECTIONS_Y.up) => {
-  let newY;
-  const oldY = y;
+  if (!canMoveY(dir)) return;
+
   let reverse;
+
   if (dir === DIRECTIONS_Y.up) {
     reverse = DIRECTIONS_Y.down;
-    newY = Math.max(0, y - STEP_Y);
+    y = y - STEP_Y;
   } else {
     reverse = DIRECTIONS_Y.up;
-    newY = Math.min(Y_MAX, y + STEP_Y);
+    y = y + STEP_Y;
   }
-  y = newY;
-  return oldY !== y && reverse;
+  return reverse;
 };
 
 const handleMove = (key) => {
