@@ -42,7 +42,7 @@ function draw() {
   base = drawEllipse("yellow", baseX, baseY);
   const bot = drawEllipse("red", x, y);
 
-  ctx.fillStyle = "rgba(34,45,23,0.4)";
+  ctx.fillStyle = "rgba(135,206,235,0.4)";
   ctx.fillRect(0, 0, can.width, can.height);
   requestAnimationFrame(draw);
 }
